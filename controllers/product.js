@@ -8,6 +8,13 @@ exports.create = async(req,res) =>{
         .save()
         res.json(product)
     }catch(err){
-        res.status(400).send('Creating Product Failed')
+        res.status(400).json({
+            err:err.message
+        })
     }
+}
+
+exports.read = async(req,res)=>{
+    let products = await Product.find({})
+    res.json(products)
 }
