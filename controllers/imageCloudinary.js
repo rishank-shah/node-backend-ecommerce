@@ -19,7 +19,7 @@ exports.upload = async(req,res)=>{
 
 exports.remove = (req,res)=>{
     let imageID = req.body.public_id
-    cloudinary.uploader.destory(imageID,(err,result)=>{
+    cloudinary.v2.uploader.destroy(imageID,(err,result)=>{
         if(err){
             return res.status(400).json({
                 err
