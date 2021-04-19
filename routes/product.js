@@ -9,6 +9,7 @@ const {
   listProducts,
   productCount,
   productStar,
+  relatedProduct
 } = require("../controllers/product");
 const { authCheck, adminCheck } = require("../middlewares/auth");
 
@@ -19,6 +20,8 @@ router.post("/products", listProducts);
 router.get("/product/total/count", productCount);
 
 router.put("/product/star/:productId", authCheck, productStar);
+
+router.get('/product/related-products/:productId',relatedProduct)
 
 router.post("/product", authCheck, adminCheck, create);
 router.put("/product/:slug", authCheck, adminCheck, update);

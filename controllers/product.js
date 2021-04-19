@@ -87,7 +87,7 @@ exports.productStar = async (req, res) => {
     email: req.user.email,
   }).exec();
 
-  let existingRattingObj = product.rattings.find(
+  let existingRattingObj = product.ratings.find(
     (rat) => rat.postedBy.toString() === user._id.toString()
   );
 
@@ -97,13 +97,14 @@ exports.productStar = async (req, res) => {
       product._id,
       {
         $push: {
-          rattings: {
+          ratings: {
             star,
             postedBy: user._id,
           },
         },
       },
       {
+        useFindAndModify: false,
         new: true,
       }
     ).exec();
@@ -111,15 +112,15 @@ exports.productStar = async (req, res) => {
     res.json(ratting);
   } else {
     //update ratting
-    const rattingUpdated = Product.updateOne(
+    const rattingUpdated = await Product.updateOne(
       {
-        rattings: {
+        ratings: {
           $elemMatch: existingRattingObj,
         },
       },
       {
         $set: {
-          "rattings.$.star": star,
+          "ratings.$.star": star,
         },
       },
       {
@@ -128,4 +129,18 @@ exports.productStar = async (req, res) => {
     ).exec();
     res.json(rattingUpdated);
   }
+};
+
+exports.relatedProduct = async (req, res) => {
+  const product = await Product.findById(req.params.productId).exec();
+
+  const related = await Product.find({
+    _id: { $ne: product._id },
+    category: product.category,
+  })
+  .limit(4)
+  .populate("category")
+  .populate("subcategories")
+  .exec();
+  res.json(related)
 };
