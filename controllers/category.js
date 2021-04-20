@@ -1,6 +1,7 @@
 const Category = require("../models/category");
 const slugify = require("slugify");
 const Subcategory = require("../models/subCategory");
+const Product = require("../models/product");
 
 exports.create = async (req, res) => {
   try {
@@ -66,5 +67,35 @@ exports.getSubCategory = (req, res) => {
       });
     }
     res.json(sub);
+  });
+};
+
+exports.getProductByCategory = async (req, res) => {
+  
+  let { page } = req.body;
+  const currentPage = page || 1;
+  const perPageProduct = 4;
+
+  let category = await Category.findOne({
+    slug: req.params.slug,
+  }).exec();
+
+  let productsCount = await Product.countDocuments({
+    category: category,
+  }).exec();
+
+  let products = await Product.find({ category: category })
+    .skip((currentPage - 1) * perPageProduct)
+    .populate("category")
+    .populate("subcategories")
+    .sort([["createdAt", "desc"]])
+    .limit(perPageProduct)
+    .exec();
+
+  res.json({
+    category,
+    products,
+    productsCount,
+    currentPage,
   });
 };
