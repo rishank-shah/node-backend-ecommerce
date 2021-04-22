@@ -59,9 +59,9 @@ exports.update = async (req, res) => {
 
 exports.listProducts = async (req, res) => {
   try {
-    const { sort, order, page } = req.body;
+    const { sort, order, page, limit } = req.body;
     const currentPage = page || 1;
-    const perPageProduct = 4;
+    const perPageProduct = limit || 4;
     const allProducts = await Product.find({})
       .skip((currentPage - 1) * perPageProduct)
       .populate("category")
@@ -138,9 +138,28 @@ exports.relatedProduct = async (req, res) => {
     _id: { $ne: product._id },
     category: product.category,
   })
-  .limit(4)
-  .populate("category")
-  .populate("subcategories")
-  .exec();
-  res.json(related)
+    .limit(4)
+    .populate("category")
+    .populate("subcategories")
+    .exec();
+  res.json(related);
+};
+
+exports.searchFilterProduct = async (req, res) => {
+  const { search_query } = req.body;
+
+  if (search_query) {
+    const products = await Product.find({
+      $text: { $search: search_query },
+    })
+      .populate("category")
+      .populate("subcategories")
+      .sort([["createdAt", "desc"]])
+      .exec();
+    return res.json(products);
+  } else {
+    return res.json({
+      error: "Please provide a query",
+    });
+  }
 };
