@@ -18,7 +18,7 @@ cp .env.example .env
 
 ##### Firebase config
 ```bash
-cd node-backend-ecommerce
+cd node-backend-ecommerce/config
 cp firebase-service-account-key.example.json firebase-service-account-key.json
 ```
 ###### Fill ```firebase-service-account-key.json``` with the necessary credentials

@@ -146,7 +146,16 @@ exports.relatedProduct = async (req, res) => {
 };
 
 exports.searchFilterProduct = async (req, res) => {
-  const { search_query } = req.body;
+  const {
+    search_query,
+    price,
+    category,
+    numberOfStars,
+    subCategories,
+    shipping,
+    color,
+    brand,
+  } = req.body;
 
   if (search_query) {
     const products = await Product.find({
@@ -157,7 +166,165 @@ exports.searchFilterProduct = async (req, res) => {
       .sort([["createdAt", "desc"]])
       .exec();
     return res.json(products);
-  } else {
+  }
+
+  if (price !== undefined) {
+    try {
+      const products = await Product.find({
+        price: {
+          $gte: price[0],
+          $lte: price[1],
+        },
+      })
+        .populate("category")
+        .populate("subcategories")
+        .sort([["createdAt", "desc"]])
+        .exec();
+      return res.json(products);
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (category) {
+    try {
+      const products = await Product.find({
+        category,
+      })
+        .populate("category")
+        .populate("subcategories")
+        .sort([["createdAt", "desc"]])
+        .exec();
+      return res.json(products);
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (numberOfStars) {
+    try {
+      Product.aggregate([
+        {
+          $project: {
+            document: "$$ROOT", //complete fields of products, can use title:'$title' instead
+            floorAverage: {
+              $floor: {
+                $avg: "$ratings.star",
+              },
+            },
+          },
+        },
+        { $match: { floorAverage: numberOfStars } },
+      ]).exec((err, aggregates) => {
+        if (err) {
+          res.status(400).json({
+            err: err,
+          });
+        } else {
+          Product.find({ _id: aggregates })
+            .populate("category")
+            .populate("subcategories")
+            .sort([["createdAt", "desc"]])
+            .exec((err, products) => {
+              if (err) {
+                res.status(400).json({
+                  err: err,
+                });
+              } else {
+                return res.json(products);
+              }
+            });
+        }
+      });
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (subCategories) {
+    try {
+      const products = await Product.find({
+        subcategories: subCategories,
+      })
+        .populate("category")
+        .populate("subcategories")
+        .sort([["createdAt", "desc"]])
+        .exec();
+      return res.json(products);
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (shipping) {
+    try {
+      const products = await Product.find({
+        shipping: shipping,
+      })
+        .populate("category")
+        .populate("subcategories")
+        .sort([["createdAt", "desc"]])
+        .exec();
+      return res.json(products);
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (color) {
+    try {
+      const products = await Product.find({
+        color: color,
+      })
+        .populate("category")
+        .populate("subcategories")
+        .sort([["createdAt", "desc"]])
+        .exec();
+      return res.json(products);
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (brand) {
+    try {
+      const products = await Product.find({
+        brand: brand,
+      })
+        .populate("category")
+        .populate("subcategories")
+        .sort([["createdAt", "desc"]])
+        .exec();
+      return res.json(products);
+    } catch (err) {
+      res.status(400).json({
+        err: err.message,
+      });
+    }
+  }
+
+  if (
+    !search_query &&
+    !price &&
+    !category &&
+    !numberOfStars &&
+    !subCategories &&
+    !shipping &&
+    !color &&
+    !brand
+  ) {
     return res.json({
       error: "Please provide a query",
     });
