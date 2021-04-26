@@ -6,6 +6,7 @@ const {
   getUserCart,
   deleteUserCart,
   saveUserAddress,
+  getUserAddress,
 } = require("../controllers/user");
 
 router.post("/user/cart/checkout", authCheck, userCartSave);
@@ -14,6 +15,8 @@ router.get("/user/cart/checkout", authCheck, getUserCart);
 
 router.delete("/user/cart/checkout", authCheck, deleteUserCart);
 
-router.post('/user/address',authCheck,saveUserAddress)
+router.get("/user/saved/address", authCheck, getUserAddress);
+
+router.post("/user/address", authCheck, saveUserAddress);
 
 module.exports = router;
