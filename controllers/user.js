@@ -117,6 +117,6 @@ exports.getUserAddress = async (req, res) => {
     email: req.user.email,
   }).exec();
   res.json({
-    address: userAddress.address,
+    address: userAddress.address || '',
   });
 };
