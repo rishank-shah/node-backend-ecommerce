@@ -67,7 +67,7 @@ exports.applyCouponToCart = async(req,res)=>{
           {orderedBy : user._id},
           {totalAfterDiscount : totalAfterDiscount2},
           {new:true}
-        )
+        ).exec();
         res.json({
           'totalAfterDiscount':totalAfterDiscount2
         })
