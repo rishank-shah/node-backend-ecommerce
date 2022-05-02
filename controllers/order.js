@@ -44,3 +44,27 @@ exports.getOrders = async (req, res) => {
     orders,
   })
 }
+
+exports.getAllOrdersAdmin = async (req, res) => {
+  const orders = await Order.find({})
+    .sort("-createdAt")
+    .populate("products.product")
+    .exec()
+  return res.json({
+    success: true,
+    orders,
+  })
+}
+
+exports.orderStatusAdmin = async (req, res) => {
+  const { orderID, orderStatus } = req.body;
+  let updated = await Order.findByIdAndUpdate(
+    orderID,
+    { orderStatus },
+    { new: true }
+  ).exec();
+  return res.json({
+    success: true,
+    order: updated,
+  })
+}

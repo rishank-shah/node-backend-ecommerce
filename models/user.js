@@ -14,10 +14,10 @@ const userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    // wishlist: [{
-    //     type:ObjectId,
-    //     ref:'Product'
-    // }],
+    wishlist: [{
+      type: ObjectId,
+      ref: 'Product'
+    }],
     role: {
       type: String,
       default: "user-normal",

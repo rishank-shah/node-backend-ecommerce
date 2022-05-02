@@ -120,3 +120,38 @@ exports.getUserAddress = async (req, res) => {
     address: userAddress.address || '',
   });
 };
+
+exports.getUserWishlist = async (req, res) => {
+  const user = await User.findOne({
+    email: req.user.email,
+  })
+    .select('wishlist')
+    .populate('wishlist')
+    .exec();
+  return res.json({
+    wishlist: user.wishlist,
+    success: true
+  });
+}
+
+exports.saveUserWishlist = async (req, res) => {
+  const { productID } = req.body
+  const user = await User.findOneAndUpdate(
+    { email: req.user.email },
+    { $addToSet: { wishlist: productID } }
+  ).exec()
+  return res.json({
+    success: true,
+  })
+}
+
+exports.updateUserWishlist = async (req, res) => {
+  const { productID } = req.params
+  const user = await User.findOneAndUpdate(
+    { email: req.user.email },
+    { $pull: { wishlist: productID } }
+  ).exec()
+  return res.json({
+    success: true,
+  })
+}
